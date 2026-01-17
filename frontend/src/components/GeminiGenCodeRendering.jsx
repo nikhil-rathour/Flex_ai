@@ -12,7 +12,7 @@ const GeminiGenCodeRendering = ({ generatedCode, formData }) => {
     setError(null);
     try {
       const { websiteType, sections, context, palette, layout } = formData || {};
-      const response = await api.post("http://localhost:4000/api/gemini/generate", {
+      const response = await api.post("/gemini/generate", {
         websiteType, sections, context, palette, layout
       });
       setCode(response.data.output);

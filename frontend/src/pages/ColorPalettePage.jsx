@@ -12,7 +12,7 @@ const ColorPalettePage = () => {
   useEffect(() => {
     const fetchPalettes = async () => {
       try {
-        const response = await api.get('http://localhost:4000/api/palettes');
+        const response = await api.get('/palettes');
         setPalettes(response.data);
       } catch (error) {
         console.error('Failed to fetch palettes:', error);

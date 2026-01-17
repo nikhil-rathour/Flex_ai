@@ -82,7 +82,7 @@ const GeminiForm = () => {
     setLoading(true);
     
     try {
-      const response = await api.post("http://localhost:4000/api/gemini/generate" , {
+      const response = await api.post("/gemini/generate" , {
         websiteType, 
         sections: sections.join(','), 
         context,
