@@ -24,11 +24,7 @@ const GeminiGenCodeRendering = ({ generatedCode, formData }) => {
     }
   };
 
-  useEffect(() => {
-    if (error && !retrying) {
-      retryGeneration();
-    }
-  }, [error]);
+
   
   if (!codeString) {
     return <div className="p-8 text-center">No code generated</div>;
