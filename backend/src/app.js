@@ -14,8 +14,8 @@ app.use("/api/gemini", geminiRouter);
 app.use("/api", paletteRouter);
 app.use("/api/codes", codeStorageRouter);
 
-app.get("/health", (req, res) => {
-    res.status(200).send("OK");
+app.get("/", (req, res) => {
+    res.status(200).send("OK flex Ai");
 });
 
 export default app;
