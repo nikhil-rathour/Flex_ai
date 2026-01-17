@@ -2,6 +2,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../configs/firebase.js";
 import { useAuthState } from "../hooks/useAuthState";
 import { useNavigate } from "react-router-dom";
+import { PillButton, SecondaryButton } from "./ui.jsx";
 
 const Navbar = () => {
   const { user } = useAuthState();
@@ -17,24 +18,32 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-md px-6 py-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold text-gray-800">AI Website Builder</h1>
-        
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate("/deployments")}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition"
-          >
-            My Deployments
-          </button>
-          <span className="text-gray-600">Welcome, {user?.displayName}</span>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition"
-          >
-            Logout
-          </button>
+    <nav className="sticky top-0 z-50">
+      <div className="border-b border-white/50 bg-white/70 shadow-[0_8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <span className="text-lg font-semibold tracking-tight text-slate-900">
+              Flex AI Studio
+            </span>
+            <span className="rounded-full bg-slate-900/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+              AI
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <PillButton onClick={() => navigate("/deployments")}>
+              My Deployments
+            </PillButton>
+            <span className="hidden text-sm text-slate-600 sm:inline">
+              Hi, {user?.displayName || "Creator"}
+            </span>
+            <SecondaryButton
+              onClick={handleLogout}
+              className="border-rose-200 text-rose-600 hover:bg-rose-50"
+            >
+              Logout
+            </SecondaryButton>
+          </div>
         </div>
       </div>
     </nav>
