@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import api from '../services/authService';
 
 const GeminiGenCodeRendering = ({ generatedCode, formData }) => {
@@ -24,11 +24,7 @@ const GeminiGenCodeRendering = ({ generatedCode, formData }) => {
     }
   };
 
-  useEffect(() => {
-    if (error && !retrying) {
-      retryGeneration();
-    }
-  }, [error]);
+
   
   if (!codeString) {
     return <div className="p-8 text-center">No code generated</div>;
