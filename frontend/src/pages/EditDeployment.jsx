@@ -1,127 +1,167 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { codeService } from '../services/codeService';
-import { toast } from 'react-toastify';
-import Navbar from '../components/Navbar';
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import Navbar from "../components/Navbar";
+import { codeService } from "../services/codeService";
+import {
+  Container,
+  GlassCard,
+  HelperText,
+  PageShell,
+  PrimaryButton,
+  SecondaryButton,
+  SectionTitle,
+} from "../components/ui.jsx";
 
 const EditDeployment = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const [username, setUsername] = useState('');
-  const [updateRequirements, setUpdateRequirements] = useState('');
+  const [username, setUsername] = useState("");
+  const [updateRequirements, setUpdateRequirements] = useState("");
   const [existingCode, setExistingCode] = useState(null);
 
-  useEffect(() => {
-    fetchCode();
-  }, [id]);
-
-  const fetchCode = async () => {
+  const fetchCode = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await codeService.getCodeForEdit(id);
       setUsername(data.username);
       setExistingCode(data.code);
     } catch (error) {
-      toast.error('Failed to fetch deployment');
-      navigate('/deployments');
+      void error;
+      toast.error("Failed to fetch deployment");
+      navigate("/deployments");
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    
-    if (!username.trim()) {
-      toast.error('Username is required');
-      return;
-    }
+  useEffect(() => {
+    fetchCode();
+  }, [fetchCode]);
 
-    setUpdating(true);
-    try {
-      let updatedCode = existingCode;
+  const handleUpdate = useCallback(
+    async (event) => {
+      event.preventDefault();
 
-      if (updateRequirements.trim()) {
-        const result = await codeService.updateCodeWithGemini(existingCode, updateRequirements);
-        updatedCode = result.output;
+      if (!username.trim()) {
+        toast.error("Username is required");
+        return;
       }
 
-      await codeService.updateDeployment(id, username, updatedCode);
-      toast.success('Deployment updated successfully');
-      navigate('/deployments');
-    } catch (error) {
-      toast.error('Failed to update deployment');
-    } finally {
-      setUpdating(false);
-    }
-  };
+      setUpdating(true);
+      try {
+        let updatedCode = existingCode;
+
+        if (updateRequirements.trim()) {
+          const result = await codeService.updateCodeWithGemini(
+            existingCode,
+            updateRequirements
+          );
+          updatedCode = result.output;
+        }
+
+        await codeService.updateDeployment(id, username.trim(), updatedCode);
+        toast.success("Deployment updated successfully");
+        navigate("/deployments");
+      } catch (error) {
+        void error;
+        toast.error("Failed to update deployment");
+      } finally {
+        setUpdating(false);
+      }
+    },
+    [existingCode, id, navigate, updateRequirements, username]
+  );
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
-      </div>
+      <PageShell>
+        <Navbar />
+        <Container className="flex min-h-[70vh] items-center justify-center py-16">
+          <div className="text-lg text-slate-600">Loading deployment...</div>
+        </Container>
+      </PageShell>
     );
   }
 
   return (
-    <>
+    <PageShell>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Edit Deployment</h1>
-          
-          <form onSubmit={handleUpdate} className="bg-white rounded-lg shadow-md p-6 space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
+      <Container className="relative pb-20 pt-10 md:pt-14">
+        <div className="pointer-events-none absolute -left-20 top-10 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.22),transparent_70%)] blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 top-24 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.18),transparent_70%)] blur-3xl" />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Update Requirements (Optional)
-              </label>
-              <textarea
-                value={updateRequirements}
-                onChange={(e) => setUpdateRequirements(e.target.value)}
-                placeholder="Describe the changes you want to make to your code (e.g., 'Change the header color to blue', 'Add a contact form section')"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Leave empty if you only want to update the username
-              </p>
-            </div>
+        <div className="relative mx-auto max-w-3xl space-y-6">
+          <div>
+            <SectionTitle>Edit Deployment</SectionTitle>
+            <HelperText className="mt-2 text-slate-600">
+              Update the public username or request AI-assisted refinements for
+              the generated code.
+            </HelperText>
+          </div>
 
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => navigate('/deployments')}
-                className="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition"
-                disabled={updating}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-                disabled={updating}
-              >
-                {updating ? 'Updating...' : 'Update Deployment'}
-              </button>
-            </div>
-          </form>
+          <GlassCard className="border-white/70 bg-white/78 p-6 shadow-[0_20px_55px_rgba(15,23,42,0.14)] sm:p-7">
+            <form onSubmit={handleUpdate} className="space-y-6">
+              <div className="space-y-2">
+                <label
+                  htmlFor="username"
+                  className="text-sm font-semibold text-slate-700"
+                >
+                  Username
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(event) => setUsername(event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-slate-800 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="update-requirements"
+                  className="text-sm font-semibold text-slate-700"
+                >
+                  Update Requirements (Optional)
+                </label>
+                <textarea
+                  id="update-requirements"
+                  value={updateRequirements}
+                  onChange={(event) => setUpdateRequirements(event.target.value)}
+                  placeholder="Describe changes you want to make (e.g., change hero section color, add contact block)."
+                  className="h-36 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-slate-800 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                />
+                <HelperText className="text-xs text-slate-500">
+                  Leave this blank if you only want to update the username.
+                </HelperText>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <SecondaryButton
+                  type="button"
+                  onClick={() => navigate("/deployments")}
+                  disabled={updating}
+                  className="flex-1 rounded-full"
+                >
+                  Cancel
+                </SecondaryButton>
+                <PrimaryButton
+                  type="submit"
+                  disabled={updating}
+                  className="flex-1 rounded-full"
+                >
+                  {updating ? "Updating..." : "Update Deployment"}
+                </PrimaryButton>
+              </div>
+            </form>
+          </GlassCard>
         </div>
-      </div>
-    </>
+      </Container>
+    </PageShell>
   );
 };
 

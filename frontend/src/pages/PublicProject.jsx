@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import GeminiGenCodeRendering from '../components/GeminiGenCodeRendering';
 import { codeService } from '../services/codeService';
 
@@ -8,6 +8,18 @@ const PublicProject = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const fetchProject = useCallback(async () => {
+    try {
+      const data = await codeService.getProjectByUsername(username);
+      setProject(data);
+    } catch (error) {
+      void error;
+      setError('Project not found');
+    } finally {
+      setLoading(false);
+    }
+  }, [username]);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -18,18 +30,7 @@ const PublicProject = () => {
     }
 
     fetchProject();
-  }, [username]);
-
-  const fetchProject = async () => {
-    try {
-      const data = await codeService.getProjectByUsername(username);
-      setProject(data);
-    } catch (error) {
-      setError('Project not found');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [fetchProject]);
 
   if (loading) {
     return (

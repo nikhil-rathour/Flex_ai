@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { codeService } from "../services/codeService";
@@ -19,11 +19,7 @@ const MyDeployments = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchDeployments();
-  }, []);
-
-  const fetchDeployments = async () => {
+  const fetchDeployments = useCallback(async () => {
     try {
       const data = await codeService.getUserDeployments();
       setDeployments(data);
@@ -33,7 +29,11 @@ const MyDeployments = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchDeployments();
+  }, [fetchDeployments]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this deployment?")) return;
@@ -71,7 +71,7 @@ const MyDeployments = () => {
       <PageShell>
         <Navbar />
         <Container className="flex min-h-[70vh] items-center justify-center py-16">
-          <div className="text-lg text-slate-600">Loading deployments...</div>
+          <div className="text-lg text-slate-600 dark:text-slate-300">Loading deployments...</div>
         </Container>
       </PageShell>
     );
@@ -96,7 +96,7 @@ const MyDeployments = () => {
             >
               <div className="max-w-xl">
                 <SectionTitle>My Deployments</SectionTitle>
-                <HelperText className="mt-2 text-slate-600">
+                <HelperText className="mt-2 text-slate-600 dark:text-slate-300">
                   Track generated sites, update details, and share with clients.
                 </HelperText>
               </div>
@@ -110,7 +110,7 @@ const MyDeployments = () => {
 
             {deployments.length === 0 ? (
               <MotionDiv variants={item}>
-                <GlassCard className="relative mx-auto flex max-w-2xl flex-col items-center gap-5 overflow-hidden border-white/70 bg-white/70 p-8 text-center shadow-[0_28px_70px_rgba(15,23,42,0.12)]">
+                <GlassCard className="relative mx-auto flex max-w-2xl flex-col items-center gap-5 overflow-hidden border-white/70 bg-white/75 p-8 text-center shadow-[0_28px_70px_rgba(15,23,42,0.12)] dark:border-slate-700 dark:bg-slate-900/75">
                   <div className="pointer-events-none absolute -top-24 right-0 h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(129,140,248,0.2),transparent_70%)] blur-3xl" />
                   <div className="relative flex h-16 w-16 items-center justify-center">
                     <div className="absolute inset-0 rounded-full bg-gradient-to-br from-sky-400 via-indigo-500 to-fuchsia-500 opacity-60 blur-lg" />
@@ -119,7 +119,7 @@ const MyDeployments = () => {
                   <SectionTitle className="text-xl sm:text-2xl">
                     No deployments yet
                   </SectionTitle>
-                  <HelperText className="text-slate-600">
+                  <HelperText className="text-slate-600 dark:text-slate-300">
                     Generate your first portfolio and see it appear here instantly.
                   </HelperText>
                   <PrimaryButton
@@ -143,21 +143,21 @@ const MyDeployments = () => {
                       variants={item}
                       whileHover={hoverLift}
                       transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                      className="flex h-full flex-col gap-5 border-white/70 bg-white/70 p-6 shadow-[0_20px_50px_rgba(15,23,42,0.1)]"
+                      className="flex h-full flex-col gap-5 border-white/70 bg-white/78 p-6 shadow-[0_20px_50px_rgba(15,23,42,0.1)] dark:border-slate-700 dark:bg-slate-900/76"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <h3 className="text-lg font-semibold text-slate-900">
+                          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                             {deployment.username}
                           </h3>
-                          <HelperText className="mt-1 text-slate-600">
+                          <HelperText className="mt-1 text-slate-600 dark:text-slate-300">
                             Created{" "}
                             {new Date(
                               deployment.createdAt
                             ).toLocaleDateString()}
                           </HelperText>
                         </div>
-                        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-700">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-700 dark:border-emerald-400/35 dark:bg-emerald-500/18 dark:text-emerald-200">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                           {status}
                         </span>
@@ -179,7 +179,7 @@ const MyDeployments = () => {
                             Edit
                           </SecondaryButton>
                           <SecondaryButton
-                            className="flex-1 rounded-full border-rose-200 text-rose-600 hover:bg-rose-50"
+                            className="flex-1 rounded-full border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-rose-400/35 dark:text-rose-300 dark:hover:bg-rose-500/10"
                             onClick={() => handleDelete(deployment._id)}
                           >
                             Delete
