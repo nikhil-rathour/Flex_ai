@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion as Motion, useReducedMotion } from "framer-motion";
 import { toast } from "react-toastify";
 import GeminiGenCodeRendering from "../components/GeminiGenCodeRendering";
 import DeploymentSuccessModal from "../components/DeploymentSuccessModal";
@@ -31,7 +31,7 @@ const ModalShell = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <Motion.div
           className="fixed inset-0 z-[1050] flex items-center justify-center bg-slate-900/50 px-4 py-6 backdrop-blur-sm"
           variants={overlayVariants}
           initial="hidden"
@@ -44,7 +44,7 @@ const ModalShell = ({
             }
           }}
         >
-          <motion.div
+          <Motion.div
             className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/60 bg-white p-6 shadow-[0_28px_80px_rgba(15,23,42,0.32)] dark:border-slate-700 dark:bg-slate-900 sm:p-7"
             initial={panelInitial}
             animate={panelAnimate}
@@ -70,8 +70,8 @@ const ModalShell = ({
               </p>
             )}
             <div className="mt-6">{children}</div>
-          </motion.div>
-        </motion.div>
+          </Motion.div>
+        </Motion.div>
       )}
     </AnimatePresence>
   );

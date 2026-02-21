@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion as Motion, useReducedMotion } from "framer-motion";
 import { toast } from "react-toastify";
 import { PrimaryButton, SecondaryButton } from "./ui.jsx";
 
@@ -61,7 +61,7 @@ const DeploymentSuccessModal = ({ isOpen, deployedUrl, onClose }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <Motion.div
           className="fixed inset-0 z-[1100] flex items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm"
           variants={overlayVariants}
           initial="hidden"
@@ -70,7 +70,7 @@ const DeploymentSuccessModal = ({ isOpen, deployedUrl, onClose }) => {
           transition={{ duration: reduceMotion ? 0 : 0.2 }}
           onMouseDown={handleOverlayClick}
         >
-          <motion.div
+          <Motion.div
             role="dialog"
             aria-modal="true"
             aria-label="Website deployed successfully"
@@ -140,8 +140,8 @@ const DeploymentSuccessModal = ({ isOpen, deployedUrl, onClose }) => {
                 or anywhere you like.
               </p>
             </div>
-          </motion.div>
-        </motion.div>
+          </Motion.div>
+        </Motion.div>
       )}
     </AnimatePresence>
   );
