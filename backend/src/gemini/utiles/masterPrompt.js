@@ -198,7 +198,10 @@ export const buildMasterPrompt = ({
   palette,
   layout
 }) => {
-  const colorHex = palette ? `Background: ${palette.colors.background}, Primary: ${palette.colors.primary}, Text: ${palette.colors.textPrimary}` : '';
+  const safeContext = (typeof context === 'string' && context.trim()) ? context.trim() : 'No additional context provided.';
+  const colorHex = palette?.colors
+    ? `Background: ${palette.colors.background}, Primary: ${palette.colors.primary}, Text: ${palette.colors.textPrimary}`
+    : '';
 
   return `Generate a SINGLE-FILE React SPA component using ONLY React.createElement.
 
@@ -226,7 +229,7 @@ WEBSITE STRUCTURE:
 - Website type: ${websiteType}
 - Layout style: ${layout || 'classic-vertical-spa'}
 - Sections to generate: ${sections}
-- Context: ${context}
+- Context: ${safeContext}
 ${colorHex ? `- Colors to use: ${colorHex}` : ''}
 
 HEADER & NAVIGATION (MANDATORY):

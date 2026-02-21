@@ -1,20 +1,30 @@
 import { geminiModel } from "../configs/gemini.js";
 import { aboutPrompt } from "./utiles/about_prompt.js";
-import { cleanJsonResponse } from "./utiles/clear_response.js";
+import { cleanJsonResponse, parseGeminiCodeResponse } from "./utiles/clear_response.js";
 import { buildMasterPrompt } from "./utiles/masterPrompt.js";
 
 // Helper function to clean markdown code blocks and extract JSON from response
 
 export const generateGeminiCode = async (req, res) => {
   try {
-    const { websiteType, sections, context, palette, layout } = req.body;
-    console.log('Request body:', req.body);
+    const websiteType = typeof req.body.websiteType === 'string' ? req.body.websiteType.trim() : '';
+    const rawSections = req.body.sections;
+    const context = typeof req.body.context === 'string' ? req.body.context.trim() : '';
+    const palette = req.body.palette;
+    const layout = req.body.layout;
 
-    if (!websiteType || !sections || !context) {
-      return res.status(400).json({ message: "Website type, sections, and context are required" });
+    const sectionsArray = Array.isArray(rawSections)
+      ? rawSections.map((section) => String(section).trim()).filter(Boolean)
+      : String(rawSections || '')
+          .split(',')
+          .map((section) => section.trim())
+          .filter(Boolean);
+
+    if (!websiteType || sectionsArray.length === 0) {
+      return res.status(400).json({ message: "Website type and at least one section are required" });
     }
 
-    const sectionsArray = sections.split(',').map(s => s.trim());
+    const sections = sectionsArray.join(',');
     console.log('Sections array:', sectionsArray);
 
     try {
@@ -28,12 +38,15 @@ export const generateGeminiCode = async (req, res) => {
 
       const result = await geminiModel.generateContent(prompt);
       const response = result.response.text();
-      const cleanedResponse = cleanJsonResponse(response);
 
       try {
-        const parsed = JSON.parse(cleanedResponse);
+        const { parsed, usedFallback } = parseGeminiCodeResponse(response);
+        if (usedFallback) {
+          console.warn('Gemini response recovered using tolerant parser fallback.');
+        }
         res.json({ output: parsed });
       } catch (parseError) {
+        const cleanedResponse = cleanJsonResponse(response);
         console.error('JSON Parse Error:', parseError.message);
         console.error('Response length:', response.length);
         console.error('Cleaned response (first 500 chars):', cleanedResponse.substring(0, 500));
