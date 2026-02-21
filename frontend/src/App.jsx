@@ -12,6 +12,7 @@ const Preview = lazy(() => import("./pages/Preview"));
 const MyDeployments = lazy(() => import("./pages/MyDeployments"));
 const PublicProject = lazy(() => import("./pages/PublicProject"));
 const EditDeployment = lazy(() => import("./pages/EditDeployment"));
+const PremiumDashboard = lazy(() => import("./pages/PremiumDashboard"));
 
 const RouteLoader = () => (
   <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50 to-sky-50 px-4">
@@ -72,6 +73,15 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <EditDeployment />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <PremiumDashboard />
                 </ProtectedRoute>
               }
             />
